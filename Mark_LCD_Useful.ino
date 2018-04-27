@@ -4,10 +4,18 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
+#include <Time.h>
+
 LiquidCrystal_I2C lcd(0x3f,20,4);  // set the LCD address to 0x3f for a 16 chars and 4 line display
+  
+  long newTimeSec;
+  long oldTimeSec;
+  int temp;  
+
 
 void setup()
 {
+
   lcd.init();                      // initialize the lcd 
   lcd.backlight();                  //  
   lcd.clear();
@@ -20,31 +28,42 @@ void setup()
 
 void loop()
 {
- int temp=random(100);
+ temp=random(100);
+ newTimeSec = hour()*3600 + minute()*60 + second();
+ 
+
+ if(newTimeSec > (oldTimeSec+4)){
+ 
+ oldTimeSec=newTimeSec;
+ printTime(newTimeSec);
  printTemp(temp);
- int newTime = millis()/1000;
- printTime(newTime);
- delay(1000);
+ }
+ delay(500);
 }
 
 
 void printTemp(int var) {
   lcd.setCursor(1,1);
-  lcd.print("     ");  // over write the old value with ___
+  lcd.print("   ");  // over write the old value with ___
   lcd.setCursor(1,1); 
   lcd.print(var);      // write the new value
 }
 
 void printTime(int var) {
   lcd.setCursor(11,1);
-  lcd.print("      ");  // over write the old value with ___
+  lcd.print("         ");  // over write the old value with ___
   lcd.setCursor(11,1);
-  lcd.print(var);   // write the new value
+  lcd.print(hour());   // write the new value
+  lcd.print(":");
+  lcd.print(minute());
+  lcd.print(":");
+  lcd.print(second());
 }
 
 void screenSetup() {
    // set up the main display         
-  /*   Temp:       Time:
+  /*   
+   *   Temp:       Time:
    *    xx   F      xxxxxx ms
    *    
    *   Text goes here
@@ -54,7 +73,7 @@ void screenSetup() {
   lcd.setCursor(10,0);
   lcd.print("Time:");
   
-  lcd.setCursor(6,1);    // logical line 1
+  lcd.setCursor(4,1);    // logical line 1
   lcd.print("F");
   lcd.setCursor(17,1);
   lcd.print("sec");
